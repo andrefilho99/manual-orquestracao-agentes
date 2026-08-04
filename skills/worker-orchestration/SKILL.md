@@ -13,7 +13,7 @@ metadata:
 
 # Worker Orchestration (unified — local serial | remote parallel)
 
-Orchestrating coding workers (Hermes profile `<WORKER_PROFILE>`) driven by a remote orchestrator model (the main profile). **UNIFIED** skill replacing the former `local-worker-orchestration` (serial, local model — e.g. llama.cpp, one GPU, one worker at a time) and `remote-worker-orchestration` (parallel, API model). The mode is a parameter: `<WORKER_MODE>` = local | remote; `<MAX_PARALLEL>` = 1 (serial) | N (parallel). Same contract, same human-merge gate; the change is the **concurrency model**: with API workers the bottleneck shifts from physical (1 GPU → 1 worker) to logical — orchestration capacity, API cost/tokens, and the human review queue. `MAX_PARALLEL` is the knob for all three; `MAX_PARALLEL = 1` reproduces the serial behavior exactly.
+Orchestrating coding workers (Hermes profile `<WORKER_PROFILE>`) driven by a remote orchestrator model (the main profile). **UNIFIED** skill — the former serial/local and parallel/remote variants are merged here: the mode is a parameter, `<WORKER_MODE>` = local | remote, and `<MAX_PARALLEL>` = 1 (serial) | N (parallel). Same contract, same human-merge gate; the change is the **concurrency model**: with API workers the bottleneck shifts from physical (1 GPU → 1 worker) to logical — orchestration capacity, API cost/tokens, and the human review queue. `MAX_PARALLEL` is the knob for all three; `MAX_PARALLEL = 1` reproduces the serial behavior exactly.
 
 ## Task authoring: real-developer briefs (user default since 2026-08)
 
