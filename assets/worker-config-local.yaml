@@ -1,0 +1,50 @@
+# Config do perfil do worker — VARIANTE LOCAL (serial, 1 worker por vez)
+# (ver variante remota em worker-config-remote.yaml; escolha por projeto:
+# <WORKER_MODE> = local | remote)
+#
+# Copie para <HERMES_HOME>/profiles/<WORKER_PROFILE>/config.yaml, preenchendo os
+# placeholders <LOCAL_MODEL>, <LOCAL_SERVER_URL> e <SEU_BACKEND_WEB>.
+# Pontos críticos:
+#   - model.base_url = servidor local OpenAI-compatível
+#   - agent.verify_on_stop: false — sem isso o worker roda verificação ad-hoc
+#     DEPOIS do PR (atraso por task e terminal ocupado); o SOUL já implementa
+#     verify-then-ship ANTES do commit.
+#   - platform_toolsets restrito a terminal/file/web/code_execution (contexto
+#     menor, menos ruído para modelo pequeno).
+#   - agent.max_turns é o knob de SOBREVIVÊNCIA de tasks grandes: pesquisa/
+#     exploração estouram 150 turns e a sessão fecha sem concluir (sem PR, sem
+#     commit). Use 250+ e confira o log do worker se uma sessão fechar cedo.
+#   - CHECKLIST antes de despachar: o config.yaml do perfil REAL deve espelhar
+#     ESTE arquivo — max_turns generoso, verify_on_stop: false e toolsets
+#     restritos.
+
+model:
+  default: <LOCAL_MODEL>
+  provider: custom
+  base_url: <LOCAL_SERVER_URL>
+agent:
+  max_turns: 250
+  verify_on_stop: false
+web:
+  backend: <SEU_BACKEND_WEB>        # ex.: brave-free, se usar gateway web
+  use_gateway: false
+browser:
+  cloud_provider: local
+  use_gateway: false
+display:
+  tool_progress: all
+tts:
+  use_gateway: false
+# _config_version: <versão da sua instalação>
+session_reset:
+  mode: none
+platform_toolsets:
+  cli:
+    - terminal
+    - file
+    - web
+    - code_execution
+custom_providers:
+  - name: Local
+    base_url: <LOCAL_SERVER_URL>
+    model: <LOCAL_MODEL>

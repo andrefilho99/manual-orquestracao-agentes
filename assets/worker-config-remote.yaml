@@ -1,0 +1,50 @@
+# Config do perfil do worker — VARIANTE REMOTA (paralela, N workers via API)
+# (ver variante local em worker-config-local.yaml; escolha por projeto:
+# <WORKER_MODE> = local | remote)
+#
+# Copie para <HERMES_HOME>/profiles/<WORKER_PROFILE>/config.yaml, preenchendo os
+# placeholders <REMOTE_MODEL>, <REMOTE_PROVIDER>, <SEU_BACKEND_WEB> e os campos
+# de gateway do seu ambiente.
+# Pontos críticos:
+#   - model.provider = provider REMOTO da sua instalação (ex.: anthropic,
+#     openai, gemini — confira a sintaxe exata do provider na sua versão do
+#     Hermes: `hermes setup` / docs). Não há servidor local de inferência.
+#   - agent.verify_on_stop: false — sem isso o worker roda verificação ad-hoc
+#     DEPOIS do PR (atraso por task e terminal ocupado); o SOUL já implementa
+#     verify-then-ship ANTES do commit.
+#   - platform_toolsets restrito a terminal/file/web/code_execution (contexto
+#     menor, menos ruído — o que o worker precisa para executar o brief).
+#   - agent.max_turns é o knob de SOBREVIVÊNCIA de tasks grandes: pesquisa/
+#     exploração (ex.: baixar fixtures, investigar sites) estouram 150 turns.
+#     Use 300+ e confira o log do worker (profiles/<WORKER_PROFILE>/logs/agent.log)
+#     se uma sessão fechar sem concluir ("max_turns" / erro de relay no fim).
+#   - CHECKLIST antes de despachar: o config.yaml do perfil REAL deve espelhar
+#     ESTE arquivo — max_turns generoso, verify_on_stop: false e toolsets
+#     restritos. Um perfil com toolsets irrestritos gasta turns com browser/
+#     computer_use e morre antes do PR (incidente 2026-08: 2 workers mortos).
+
+model:
+  default: <REMOTE_MODEL>
+  provider: <REMOTE_PROVIDER>
+agent:
+  max_turns: 300
+  verify_on_stop: false
+web:
+  backend: <SEU_BACKEND_WEB>        # ex.: brave-free
+  use_gateway: <true|false>         # worker remoto pode usar o gateway web
+browser:
+  cloud_provider: <SEU_CLOUD_PROVIDER>  # ex.: local ou o do seu ambiente
+  use_gateway: <true|false>
+display:
+  tool_progress: all
+tts:
+  use_gateway: false
+# _config_version: <versão da sua instalação>
+session_reset:
+  mode: none
+platform_toolsets:
+  cli:
+    - terminal
+    - file
+    - web
+    - code_execution
